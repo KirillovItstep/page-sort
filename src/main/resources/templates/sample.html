@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Users pagination</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.6.0/pagination.min.css">
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paginationjs/2.6.0/pagination.min.js"></script>
+</head>
+<body>
+<div>
+    <section>
+        <div id="data-container"></div>
+        <div id="pagination"></div>
+    </section>
+</div>
+
+<script>
+    $(async function () {
+        let pagination = $('#pagination');
+        var requestOptions = {
+            method: 'GET',
+            redirect: 'follow'
+        };
+        let result = [];
+        let limit = 10; let page = 0;
+        //await fetch(`http://127.0.0.1:8080/users?limit=${limit}&page=${page}`, requestOptions)
+        await fetch(`http://127.0.0.1:8080/users`, requestOptions)
+            .then(response => response.json())
+            .then(response => result.push(response))
+            .catch(error => console.log('error', error));
+
+        //console.log(result)
+
+        pagination.pagination({
+            dataSource: result[0],
+            pageSize: 10,
+            callback: function (data, pagination) {
+                var container = $('#data-container');
+                container.empty();
+                var table = $('<table>');
+                table.addClass('table table-striped m-3');
+                container.append(table);
+                var tbody = $('<tbody>');
+                table.append(tbody);
+                //Заголовок
+                var tr = $('<tr>');
+                tbody.append(tr);
+                tr.append($('<th>').html('Фамилия'));
+                tr.append($('<th>').html('Имя'));
+                tr.append($('<th>').html('Отчество'));
+                response = result[0];
+
+                $.each(data, function (index, item) {
+                        var tr = $('<tr>');
+                        var surname = $('<td>').html(item.surname);
+                        tr.append(surname);
+                        var name = $('<td>').html(item.name);
+                        tr.append(name);
+                        var patronymic = $('<td>').html(item.patronymic);
+                        tr.append(patronymic);
+
+                        //Кнопки
+                        var id = response.id;
+                        table.append(tr);
+                    }
+                );
+            }
+        })
+    })
+
+</script>
+</body>
+</html>
